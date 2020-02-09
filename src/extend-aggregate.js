@@ -25,10 +25,10 @@ module.exports = function(mongoose, cache) {
 
       const key = this._key || this.getCacheKey();
       const ttl = this._ttl;
-
+      const forceUpdate = this._forceUpdate;
       return new Promise((resolve, reject) => {
         cache.get(key, (err, cachedResults) => { //eslint-disable-line handle-callback-err
-          if (cachedResults) {
+          if (!forceUpdate && cachedResults) {
             callback(null, cachedResults);
             return resolve(cachedResults);
           }
@@ -49,7 +49,7 @@ module.exports = function(mongoose, cache) {
       });
     };
 
-    Aggregate.prototype.cache = function(ttl = 60, customKey = '') {
+    Aggregate.prototype.cache = function(ttl = 60, customKey = '', forceUpdate = false) {
       if (typeof ttl === 'string') {
         customKey = ttl;
         ttl = 60;
@@ -57,6 +57,7 @@ module.exports = function(mongoose, cache) {
 
       this._ttl = ttl;
       this._key = customKey;
+      this._forceUpdate = forceUpdate;
       return this;
     };
 
